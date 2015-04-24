@@ -75,21 +75,16 @@ if ~isempty(vic)
     v_m1=vic.vel(1);
     v_m2=vic.vel(2);
     v_m3=vic.vel(3);
-    omega1=vic.vel(4)
-    omega2=vic.vel(5)
-    omega3=vic.vel(6)
-    phi
-    theta
-    v_m1
-    v_m2
-    v_m3
+    omega1=vic.vel(4);
+    omega2=vic.vel(5);
+    omega3=vic.vel(6);
+
     
     
     xdot=xdot_func(0,0,0,0,0,0,omega1,omega2,omega3,phi,theta,v_m1,v_m2,v_m3);
     At=jacobian_x_simp_func(0,0,omega1,omega3,phi,theta);
     Ut=jacobian_n_simp_func(phi,theta);
-    dt
-    At
+
     Ft=eye(6)+dt*At;
     Vt=dt*Ut;
     
