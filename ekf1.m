@@ -39,17 +39,20 @@ function [X, Z] = ekf1(sensor, vic, varargin)
 %     note that this output is optional, it's here in case you want to log your
 %     measurement
 
-persistent x_hat_old P old_t first_time phi theta psi 
+persistent x_hat_old P old_t first_time phi theta psi
 persistent xdot_func jacobian_x_simp_func jacobian_n_simp_func
 
 if isempty(first_time)
-    init_script2
     first_time=0;
+    init_script2
     x_hat_old=zeros(6,1);
     old_t=0;
     P=eye(6);
     X=zeros(6,1);
     Z=zeros(6,1);
+    phi=0;
+    theta=0;
+    psi=0;
     return
 end
 
@@ -57,38 +60,31 @@ X = x_hat_old;
 Z=zeros(6,1);
 
 if (isempty(sensor) && isempty(vic))
+    X=nan(6,1);
+    Z=nan(6,1);
     return
 end
 
-
-
-if ~isempty(sensor)
-    [pos, eul,t] = estimate_pose(sensor, varargin);
-    
-    phi=eul(1);
-    theta=eul(2);
-    psi=eul(3);
-    
-    Z=[pos;eul];
-    
-end
-
-if ~isempty(vic)
-    dt=vic.t-old_t
-    old_t=vic.t
-    v_m1=vic.vel(1);
-    v_m2=vic.vel(2);
-    v_m3=vic.vel(3);
-    omega1=vic.vel(4);
-    omega2=vic.vel(5);
-    omega3=vic.vel(6);
-    
-end
 
 %%%%%%%%%%%%%%%%%%%%%% PREDICTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % make At, Ut, Ft Vt
 
 if ~isempty(vic)
+    dt=vic.t-old_t;
+    old_t=vic.t;
+    v_m1=vic.vel(1);
+    v_m2=vic.vel(2);
+    v_m3=vic.vel(3);
+    omega1=vic.vel(4)
+    omega2=vic.vel(5)
+    omega3=vic.vel(6)
+    phi
+    theta
+    v_m1
+    v_m2
+    v_m3
+    
+    
     xdot=xdot_func(0,0,0,0,0,0,omega1,omega2,omega3,phi,theta,v_m1,v_m2,v_m3);
     At=jacobian_x_simp_func(0,0,omega1,omega3,phi,theta);
     Ut=jacobian_n_simp_func(phi,theta);
@@ -107,28 +103,45 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%% UPDATE %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(sensor)
-    % make some variables
-    Ct=eye(6);
-    Wt=eye(6);
-    R=eye(6);
     
-    
-    % some other calculations
-    % innovation or measurement residual
-    y_tilda=[pos;eul]-eye(6)*X;
-    % innovation (or residual) covariance
-    Sk=Ct*P*Ct'+Wt*R*Wt';
-    % Optimal kalman gain
-    K=P*Ct'/Sk;
-    
-    % update estimattions
-    X=X+K*y_tilda;
-    P=P-K*Ct*P;
-    
+    if ((sensor.is_ready) && ~isempty(sensor.id))
+        
+        
+        [pos, eul,t] = estimate_pose(sensor, varargin);
+        
+        phi=eul(1);
+        theta=eul(2);
+        psi=eul(3);
+        
+        Z=[pos;eul];
+        
+        
+        
+        
+        
+        % make some variables
+        Ct=eye(6);
+        Wt=eye(6);
+        R=eye(6);
+        
+        
+        % some other calculations
+        % innovation or measurement residual
+        y_tilda=[pos;eul]-eye(6)*X;
+        % innovation (or residual) covariance
+        Sk=Ct*P*Ct'+Wt*R*Wt';
+        % Optimal kalman gain
+        K=P*Ct'/Sk;
+        
+        % update estimations
+        X=X+K*y_tilda;
+        P=P-K*Ct*P;
+        
+    end
     
 end
 
 % update old variables
-    x_hat_old=X;
+x_hat_old=X;
 
 end
