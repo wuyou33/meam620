@@ -73,7 +73,7 @@ if ~isempty(sensor)
             dt=sensor.t-old_t;
             old_t=sensor.t;
             
-            [pos, eul,t] = estimate_pose(sensor, varargin);
+            [pos, eul,~] = estimate_pose(sensor, varargin);
             [vel, ~] = estimate_vel(sensor, varargin);
             phi=eul(1);
             theta=eul(2);
@@ -130,7 +130,7 @@ if ~isempty(sensor)
             
             % some other calculations
             % innovation or measurement residual
-            y_tilda=[pos;vel;eul]-eye(9)*X;
+            y_tilda=[pos;eul;vel]-eye(9)*X;
             % innovation (or residual) covariance
             Sk=Ct*P*Ct'+Wt*R*Wt';
             % Optimal kalman gain
@@ -147,5 +147,5 @@ end
 % update old variables
 x_hat_old=X;
 
-
+X=[X(1:3);X(7:9);X(4:6)];
 end
