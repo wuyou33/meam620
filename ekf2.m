@@ -68,7 +68,7 @@ end
 if ~isempty(sensor)
     
     if ((sensor.is_ready) && ~isempty(sensor.id))
-        if (sensor.id(1)~=0)
+        %if (sensor.id(1)~=0)
             
             dt=sensor.t-old_t;
             old_t=sensor.t;
@@ -97,30 +97,30 @@ if ~isempty(sensor)
             %         Ut=jacobian_n_simp_func(phi,psi,theta)
             
             xdot=xdot_func(a_m1,a_m2,a_m3,0,0,-9.81,0,0,0,0,0,0,omega1,omega2,omega3,phi,psi,theta,v_m1,v_m2,v_m3);
-            At=jacobian_x_simp_func(a_m1,a_m2,a_m3,0,0,0,0,0,omega1,omega3,phi,psi,theta)
-            Ut=jacobian_n_simp_func(phi,psi,theta)
+            At=jacobian_x_simp_func(a_m1,a_m2,a_m3,0,0,0,0,0,omega1,omega3,phi,psi,theta);
+            Ut=jacobian_n_simp_func(phi,psi,theta);
             
             %xdot=xdot_func(0,0,0,0,0,0,omega1,omega2,omega3,phi,theta,v_m1,v_m2,v_m3);
             %At=jacobian_x_simp_func(0,0,omega1,omega3,phi,theta);
             %Ut=jacobian_n_simp_func(phi,theta);
             
-            Ft=eye(9)+dt*At
-            Vt=dt*Ut
+            Ft=eye(9)+dt*At;
+            Vt=dt*Ut;
             
             Q=eye(9); %%%% MAYBE???
             
             % make prediction
-            X=x_hat_old+xdot*dt
+            X=x_hat_old+xdot*dt;
             % predicted estimate covariance
             P=Ft*P*Ft'+Vt*Q*Vt';
-        end
+       % end
     end
 end
 %%%%%%%%%%%%%%%%%%%%%% UPDATE %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(sensor)
     
     if ((sensor.is_ready) && ~isempty(sensor.id))
-        if (sensor.id(1)~=0)
+        %if (sensor.id(1)~=0)
             
             % make some variables
             Ct=eye(9);
@@ -140,7 +140,7 @@ if ~isempty(sensor)
             X=X+K*y_tilda;
             P=P-K*Ct*P;
             
-        end
+        %end
     end
 end
 
